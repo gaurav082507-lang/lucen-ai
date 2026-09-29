@@ -13,6 +13,10 @@ def load_and_orient_image(image_path: Path) -> Image.Image:
     img = ImageOps.exif_transpose(img)
     if img.mode != "RGB":
         img = img.convert("RGB")
+    # Cap dimensions to 1600px to prevent OOM (Out Of Memory) on 512MB RAM cloud tiers like Render
+    max_dim = 1600
+    if max(img.width, img.height) > max_dim:
+        img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
     return img
 
 

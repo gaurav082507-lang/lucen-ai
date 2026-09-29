@@ -58,15 +58,19 @@ class ImagePipeline:
         noise_map = ctx.extras.get("noise_map")
 
         if img is not None:
-            w, h = img.size
-            if ela_map is None:
-                ela_map = np.zeros((h, w), dtype=np.uint8)
-            if noise_map is None:
-                noise_map = np.zeros((h, w), dtype=np.uint8)
+            try:
+                w, h = img.size
+                if ela_map is None:
+                    ela_map = np.zeros((h, w), dtype=np.uint8)
+                if noise_map is None:
+                    noise_map = np.zeros((h, w), dtype=np.uint8)
 
-            heatmap_filename = f"image_heatmap.png"
-            heatmap_path = settings.ARTIFACTS_DIR / result_id / heatmap_filename
-            save_forensic_heatmap(img, ela_map, noise_map, heatmap_path)
-            artifacts["image_heatmap"] = f"{settings.API_V1_STR}/artifacts/{result_id}/{heatmap_filename}"
+                heatmap_filename = f"image_heatmap.png"
+                heatmap_path = settings.ARTIFACTS_DIR / result_id / heatmap_filename
+                save_forensic_heatmap(img, ela_map, noise_map, heatmap_path)
+                artifacts["image_heatmap"] = f"{settings.API_V1_STR}/artifacts/{result_id}/{heatmap_filename}"
+            except Exception as e:
+                from backend.app.core.logging import logger
+                logger.warning("Heatmap artifact generation skipped: %s", e)
 
         return all_evidence, statuses, artifacts
