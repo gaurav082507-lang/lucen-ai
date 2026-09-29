@@ -1,5 +1,21 @@
 from typing import Any, Literal, Optional
-from pydantic import BaseModel, Field
+import numpy as np
+from pydantic import BaseModel, Field, field_validator
+
+
+def sanitize_json_value(val: Any) -> Any:
+    """Recursively converts NumPy scalar types and arrays into standard Python types."""
+    if isinstance(val, (np.integer, int)):
+        return int(val)
+    elif isinstance(val, (np.floating, float)):
+        return float(val)
+    elif isinstance(val, np.ndarray):
+        return val.tolist()
+    elif isinstance(val, dict):
+        return {str(k): sanitize_json_value(v) for k, v in val.items()}
+    elif isinstance(val, (list, tuple, set)):
+        return [sanitize_json_value(v) for v in val]
+    return val
 
 
 class BBox(BaseModel):
@@ -28,3 +44,10 @@ class Evidence(BaseModel):
     bbox: Optional[BBox] = None
     details: dict[str, Any] = Field(default_factory=dict)
     artifact: Optional[str] = None
+
+    @field_validator("details", mode="before")
+    @classmethod
+    def sanitize_details(cls, v: Any) -> dict[str, Any]:
+        if isinstance(v, dict):
+            return sanitize_json_value(v)
+        return {}

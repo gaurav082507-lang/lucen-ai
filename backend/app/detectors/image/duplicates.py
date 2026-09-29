@@ -24,7 +24,8 @@ class ImageDuplicateDetector:
 
         if matches:
             matched_id, dist = matches[0]
-            similarity = round(1.0 - (dist / 64.0), 2)
+            dist_int = int(dist)
+            similarity = float(round(1.0 - (dist_int / 64.0), 2))
             evidence.append(
                 Evidence(
                     id="IMG-DUP-01",
@@ -38,8 +39,9 @@ class ImageDuplicateDetector:
                     severity="high" if similarity >= 0.90 else "medium",
                     title="Duplicate Claim Photo Detected",
                     reason=f"Photo closely matches an image previously submitted in claim '{matched_id}' ({similarity:.0%} match).",
-                    details={"other_id": matched_id, "hamming_distance": dist, "similarity": similarity},
+                    details={"other_id": str(matched_id), "hamming_distance": dist_int, "similarity": similarity},
                 )
             )
 
-        return DetectorOutput(evidence=evidence, extras={"phash": phash_val, "duplicate_matches": matches})
+        safe_matches = [(str(m[0]), int(m[1])) for m in matches]
+        return DetectorOutput(evidence=evidence, extras={"phash": phash_val, "duplicate_matches": safe_matches})

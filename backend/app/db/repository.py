@@ -107,7 +107,8 @@ def save_analysis_result(result: AnalysisResult, job_id: Optional[str] = None):
 
         for ev in result.evidence:
             bbox_json = ev.bbox.model_dump_json() if ev.bbox else None
-            details_json = json.dumps(ev.details)
+            from backend.app.schemas.evidence import sanitize_json_value
+            details_json = json.dumps(sanitize_json_value(ev.details), default=str)
             conn.execute(
                 """
                 INSERT INTO evidence (
