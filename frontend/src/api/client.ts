@@ -3,10 +3,22 @@ import type { AnalysisResult, ClaimMetadata, DemoSample, JobStatus } from "./typ
 const API_BASE = "/api/v1";
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, options);
+  let res: Response;
+  try {
+    res = await fetch(url, options);
+  } catch (netErr) {
+    throw new Error("Cannot connect to backend server. Please verify backend is running on port 8000.");
+  }
+
   if (!res.ok) {
+    if (res.status === 502) {
+      throw new Error("Backend server is starting up or temporarily unavailable (HTTP 502). Please wait a few seconds and try again.");
+    }
+    if (res.status === 504) {
+      throw new Error("Gateway timeout (HTTP 504). The server took too long to respond. Please try again.");
+    }
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.detail || err?.error?.message || `HTTP ${res.status}: ${res.statusText}`);
+    throw new Error(err?.detail || err?.error?.message || `HTTP ${res.status}: ${res.statusText || 'Error'}`);
   }
   return res.json();
 }
