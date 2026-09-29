@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.egg
+dist/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Runtime data
+data/runtime/
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Models (downloaded at runtime)
+models/*.bin
+models/*.safetensors
+
+# Logs
+*.log
+
+# Gemini/Antigravity
+.gemini/

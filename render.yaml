@@ -1,0 +1,18 @@
+# Lucen AI — Render Blueprint
+# Deploy as a single web service
+
+services:
+  - type: web
+    name: lucen-ai
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: "chmod +x build.sh && ./build.sh"
+    startCommand: "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: NODE_VERSION
+        value: "20.18.0"
+      - key: MOCK_ANALYSIS
+        value: "0"

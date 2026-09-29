@@ -1,0 +1,30 @@
+# Lucen AI — Python Backend Dependencies
+# Pinned for Render deployment
+
+fastapi==0.141.1
+uvicorn==0.54.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+python-multipart==0.0.32
+python-dotenv==1.2.3
+httpx==0.28.1
+starlette==1.7.0
+
+# Image / CV
+pillow==12.3.0
+opencv-python-headless==5.0.0.93
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.9.1
+ImageHash==4.3.2
+
+# PDF / Document
+pymupdf==1.28.2
+RapidFuzz==3.14.6
+reportlab==5.0.1
+
+# ML (CPU only — no torch on free tier to save memory)
+# transformers and torch are optional; the app uses frequency heuristic fallback
+
+# Misc
+PyYAML==6.0.3
