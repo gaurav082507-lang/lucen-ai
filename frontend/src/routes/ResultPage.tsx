@@ -14,11 +14,14 @@ export default function ResultPage() {
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const retryCountRef = useRef(0)
+  const MAX_RETRIES = 6
 
   const fetchJob = async () => {
     if (!id) return
     try {
       const j = await claimGuardApi.getJob(id)
+      retryCountRef.current = 0
       setJob(j)
       if (j.status === 'done') {
         if (pollRef.current) clearInterval(pollRef.current)
@@ -34,8 +37,11 @@ export default function ResultPage() {
         setError('Analysis failed: ' + (j.error || 'Unknown error'))
       }
     } catch (e) {
-      setError('Could not reach backend: ' + (e instanceof Error ? e.message : String(e)))
-      if (pollRef.current) clearInterval(pollRef.current)
+      retryCountRef.current += 1
+      if (retryCountRef.current >= MAX_RETRIES) {
+        setError('Could not reach backend: ' + (e instanceof Error ? e.message : String(e)))
+        if (pollRef.current) clearInterval(pollRef.current)
+      }
     }
   }
 
@@ -52,7 +58,7 @@ export default function ResultPage() {
       const blob = await claimGuardApi.downloadReport(resultId)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = url; a.download = `claimguard_report_${resultId}.pdf`; a.click()
+      a.href = url; a.download = `lucen_ai_report_${resultId}.pdf`; a.click()
       URL.revokeObjectURL(url)
     } catch (e) {
       alert('Could not download report: ' + (e instanceof Error ? e.message : String(e)))
